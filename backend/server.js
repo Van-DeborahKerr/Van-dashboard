@@ -29,10 +29,6 @@ const checkPin = (req, res, next) => {
   next();
 };
 
-// Apply PIN check to all data endpoints
-app.use('/api/readings', checkPin);
-app.use('/api/data', checkPin);
-
 // Database setup
 const dbPath = path.join(__dirname, 'data', 'charlie.db');
 const db = new sqlite3.Database(dbPath, (err) => {
@@ -63,10 +59,23 @@ db.serialize(() => {
   `);
 });
 
-// API Routes
+// SERVE STATIC FILES FIRST (no auth needed for HTML/CSS/JS)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Health check (no auth required)
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Charlie Backend Running',
+    environment: NODE_ENV,
+    auth_enabled: PIN !== 'disabled'
+  });
+});
+
+// API Routes (with PIN auth)
 
 // POST - Add new reading
-app.post('/api/readings', (req, res) => {
+app.post('/api/readings', checkPin, (req, res) => {
   const {
     allpowers_battery,
     allpowers_watts,
@@ -111,7 +120,7 @@ app.post('/api/readings', (req, res) => {
 });
 
 // GET - Latest reading
-app.get('/api/readings/latest', (req, res) => {
+app.get('/api/readings/latest', checkPin, (req, res) => {
   const query = `SELECT * FROM readings ORDER BY timestamp DESC LIMIT 1`;
   db.get(query, (err, row) => {
     if (err) {
@@ -123,7 +132,7 @@ app.get('/api/readings/latest', (req, res) => {
 });
 
 // GET - Last 24 hours of readings
-app.get('/api/readings/24h', (req, res) => {
+app.get('/api/readings/24h', checkPin, (req, res) => {
   const query = `
     SELECT * FROM readings 
     WHERE timestamp >= datetime('now', '-24 hours')
@@ -139,7 +148,7 @@ app.get('/api/readings/24h', (req, res) => {
 });
 
 // GET - Stats endpoint
-app.get('/api/data/stats', (req, res) => {
+app.get('/api/data/stats', checkPin, (req, res) => {
   const query = `
     SELECT 
       AVG(allpowers_battery) as avg_allpowers_battery,
@@ -160,20 +169,7 @@ app.get('/api/data/stats', (req, res) => {
   });
 });
 
-// Health check (no auth required)
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'Charlie Backend Running',
-    environment: NODE_ENV,
-    auth_enabled: PIN !== 'disabled'
-  });
-});
-
-// Serve React frontend
-app.use(express.static(path.join(__dirname, 'public')));
-
-// SPA fallback
+// SPA fallback - serve index.html for any route not matching API
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

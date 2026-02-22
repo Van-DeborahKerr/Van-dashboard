@@ -12,12 +12,13 @@ import TapoLED from './components/TapoLED';
 import HamRadio from './components/HamRadio';
 import CampsiteFinder from './components/CampsiteFinder';
 import MediaConverter from './components/MediaConverter';
+import Home from './components/Home';
 import './App.css';
 
 function App() {
   const [latestReading, setLatestReading] = useState(null);
   const [readings24h, setReadings24h] = useState([]);
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('home');
   const [loading, setLoading] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [pin, setPin] = useState('');
@@ -124,7 +125,12 @@ function App() {
   };
 
   if (!authenticated) {
-    return <AuthModal onSubmit={handleAuthSubmit} required={authRequired} />;
+    return (
+      <div>
+        <Home />
+        <AuthModal onSubmit={handleAuthSubmit} required={authRequired} />
+      </div>
+    );
   }
 
   return (
@@ -140,6 +146,12 @@ function App() {
       </header>
 
       <nav className="tabs">
+        <button
+          className={`tab ${activeTab === 'home' ? 'active' : ''}`}
+          onClick={() => setActiveTab('home')}
+        >
+          🏠 Home
+        </button>
         <button
           className={`tab ${activeTab === 'dashboard' ? 'active' : ''}`}
           onClick={() => setActiveTab('dashboard')}
@@ -204,6 +216,9 @@ function App() {
 
       <main className="content">
         {error && <div className="error-alert">{error}</div>}
+        {activeTab === 'home' && (
+          <Home />
+        )}
         {activeTab === 'dashboard' && (
           <Dashboard latestReading={latestReading} readings24h={readings24h} />
         )}
