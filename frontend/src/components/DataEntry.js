@@ -65,7 +65,7 @@ function DataEntry({ onSubmit, loading }) {
   return (
     <div className="data-entry">
       <h2>Add Energy Reading</h2>
-      <p>Enter current values from your apps</p>
+      <p>Enter current values from your apps (every 20 minutes)</p>
 
       {error && <div className="alert error">{error}</div>}
       {success && <div className="alert success">Reading saved successfully!</div>}

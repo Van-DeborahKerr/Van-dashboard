@@ -38,7 +38,7 @@ function App() {
     fetchReadings24h();
     const interval = setInterval(() => {
       fetchLatestReading();
-    }, 30000); // Poll every 30 seconds
+    }, 1200000); // Poll every 20 minutes
     return () => clearInterval(interval);
   }, []);
 
