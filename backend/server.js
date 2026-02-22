@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -6,10 +7,31 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const PIN = process.env.DASHBOARD_PIN || '1234';
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+
+// Authentication middleware
+const checkPin = (req, res, next) => {
+  const pin = req.headers['x-dashboard-pin'] || req.query.pin;
+  
+  if (PIN === 'disabled') {
+    return next(); // No auth required in dev
+  }
+  
+  if (!pin || pin !== PIN) {
+    return res.status(401).json({ error: 'Unauthorized. Invalid or missing PIN.' });
+  }
+  
+  next();
+};
+
+// Apply PIN check to all data endpoints
+app.use('/api/readings', checkPin);
+app.use('/api/data', checkPin);
 
 // Database setup
 const dbPath = path.join(__dirname, 'data', 'charlie.db');
@@ -116,14 +138,51 @@ app.get('/api/readings/24h', (req, res) => {
   });
 });
 
-// GET - Health check
+// GET - Stats endpoint
+app.get('/api/data/stats', (req, res) => {
+  const query = `
+    SELECT 
+      AVG(allpowers_battery) as avg_allpowers_battery,
+      AVG(ecoflow_battery) as avg_ecoflow_battery,
+      AVG(lifepo4_battery) as avg_lifepo4_battery,
+      AVG(solar_watts) as avg_solar_watts,
+      MAX(allpowers_watts) as max_allpowers_watts,
+      COUNT(*) as total_readings
+    FROM readings 
+    WHERE timestamp >= datetime('now', '-24 hours')
+  `;
+  db.get(query, (err, row) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json(row || {});
+    }
+  });
+});
+
+// Health check (no auth required)
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Charlie Backend Running' });
+  res.json({ 
+    status: 'OK', 
+    message: 'Charlie Backend Running',
+    environment: NODE_ENV,
+    auth_enabled: PIN !== 'disabled'
+  });
+});
+
+// Serve React frontend
+app.use(express.static(path.join(__dirname, 'public')));
+
+// SPA fallback
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start server
 app.listen(PORT, () => {
   console.log(`Charlie Backend running on port ${PORT}`);
+  console.log(`Environment: ${NODE_ENV}`);
+  console.log(`Auth enabled: ${PIN !== 'disabled'}`);
 });
 
 module.exports = app;

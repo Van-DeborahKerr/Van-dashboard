@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Dashboard from './components/Dashboard';
 import DataEntry from './components/DataEntry';
+import AuthModal from './components/AuthModal';
 import './App.css';
 
 function App() {
@@ -9,15 +10,47 @@ function App() {
   const [readings24h, setReadings24h] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [loading, setLoading] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [pin, setPin] = useState('');
+  const [authRequired, setAuthRequired] = useState(false);
+  const [error, setError] = useState(null);
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
+  // Check if auth is required on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/health`);
+        if (response.data.auth_enabled) {
+          setAuthRequired(true);
+          const storedPin = localStorage.getItem('charlie-pin');
+          if (storedPin) {
+            setPin(storedPin);
+            setAuthenticated(true);
+          }
+        } else {
+          setAuthenticated(true);
+        }
+      } catch (err) {
+        console.error('Error checking auth:', err);
+      }
+    };
+    checkAuth();
+  }, [API_URL]);
 
   // Fetch latest reading
   const fetchLatestReading = async () => {
     try {
-      const response = await axios.get(`${API_URL}/readings/latest`);
+      const headers = pin ? { 'x-dashboard-pin': pin } : {};
+      const response = await axios.get(`${API_URL}/readings/latest`, { headers });
       setLatestReading(response.data);
+      setError(null);
     } catch (error) {
+      if (error.response?.status === 401) {
+        setAuthenticated(false);
+        localStorage.removeItem('charlie-pin');
+      }
       console.error('Error fetching latest reading:', error);
     }
   };
@@ -25,7 +58,8 @@ function App() {
   // Fetch 24h readings
   const fetchReadings24h = async () => {
     try {
-      const response = await axios.get(`${API_URL}/readings/24h`);
+      const headers = pin ? { 'x-dashboard-pin': pin } : {};
+      const response = await axios.get(`${API_URL}/readings/24h`, { headers });
       setReadings24h(response.data);
     } catch (error) {
       console.error('Error fetching 24h readings:', error);
@@ -34,13 +68,21 @@ function App() {
 
   // Initial load and set polling
   useEffect(() => {
+    if (!authenticated) return;
+    
     fetchLatestReading();
     fetchReadings24h();
     const interval = setInterval(() => {
       fetchLatestReading();
     }, 1200000); // Poll every 20 minutes
     return () => clearInterval(interval);
-  }, []);
+  }, [authenticated, pin]);
+
+  const handleAuthSubmit = (inputPin) => {
+    setPin(inputPin);
+    localStorage.setItem('charlie-pin', inputPin);
+    setAuthenticated(true);
+  };
 
   const handleDataSubmit = async () => {
     setLoading(true);
@@ -50,11 +92,26 @@ function App() {
     setActiveTab('dashboard');
   };
 
+  const handleLogout = () => {
+    setAuthenticated(false);
+    setPin('');
+    localStorage.removeItem('charlie-pin');
+  };
+
+  if (!authenticated) {
+    return <AuthModal onSubmit={handleAuthSubmit} required={authRequired} />;
+  }
+
   return (
     <div className="App">
       <header className="header">
         <h1>Charlie - Van Energy Dashboard</h1>
         <p>Real-time power monitoring for van & home</p>
+        {authRequired && (
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        )}
       </header>
 
       <nav className="tabs">
@@ -73,11 +130,12 @@ function App() {
       </nav>
 
       <main className="content">
+        {error && <div className="error-alert">{error}</div>}
         {activeTab === 'dashboard' && (
           <Dashboard latestReading={latestReading} readings24h={readings24h} />
         )}
         {activeTab === 'entry' && (
-          <DataEntry onSubmit={handleDataSubmit} loading={loading} />
+          <DataEntry onSubmit={handleDataSubmit} loading={loading} pin={pin} />
         )}
       </main>
     </div>

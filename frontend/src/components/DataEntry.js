@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './DataEntry.css';
 
-function DataEntry({ onSubmit, loading }) {
+function DataEntry({ onSubmit, loading, pin }) {
   const [formData, setFormData] = useState({
     allpowers_battery: '',
     allpowers_watts: '',
@@ -38,7 +38,9 @@ function DataEntry({ onSubmit, loading }) {
     setSuccess(false);
 
     try {
-      await axios.post(`${API_URL}/readings`, formData);
+      await axios.post(`${API_URL}/readings`, formData, {
+        headers: pin ? { 'x-dashboard-pin': pin } : {}
+      });
       setSuccess(true);
       setFormData({
         allpowers_battery: '',
@@ -58,7 +60,11 @@ function DataEntry({ onSubmit, loading }) {
       setTimeout(() => setSuccess(false), 3000);
       onSubmit();
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to submit reading');
+      if (err.response?.status === 401) {
+        setError('Session expired. Please re-authenticate.');
+      } else {
+        setError(err.response?.data?.error || 'Failed to submit reading');
+      }
     }
   };
 
