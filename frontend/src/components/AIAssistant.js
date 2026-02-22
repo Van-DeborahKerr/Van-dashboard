@@ -150,8 +150,8 @@ function AIAssistant() {
     <div className="ai-assistant">
       {!connected ? (
         <div className="ai-config">
-          <h3>🐾 Minnie & Doris AI Hub 🐾</h3>
-          <p>Meet Charlie's furry AI team!</p>
+          <h3>🎧 Charlie's Crew AI Hub 🐾</h3>
+          <p>Minnie & Doris - Meet the team!</p>
           
           <div className="personality-select">
             <button

@@ -124,8 +124,8 @@ function App() {
   return (
     <div className="App">
       <header className="header">
-        <h1>Charlie - Van Energy Dashboard</h1>
-        <p>Real-time power monitoring for van & home</p>
+        <h1>🎧 Charlie - Van Energy Dashboard</h1>
+        <p>Built by Charlie. Powered by Bill, Deborah, Minnie & Doris</p>
         {authRequired && (
           <button className="logout-btn" onClick={handleLogout}>
             Logout

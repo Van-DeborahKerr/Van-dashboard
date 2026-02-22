@@ -1,8 +1,9 @@
 # Charlie - Van Dashboard Project
-**Owner:** Bill & Deborah Shackel  
-**Team:** Minnie (guardian) & Doris (dopey sister) 🐾  
+**Creator:** Charlie (Tech Mastermind) 🎧  
+**Van Lifers:** Bill & Deborah Shackel  
+**Team Guardians:** Minnie (alert) & Doris (dopey) 🐾  
 **Start Date:** 2026-02-22  
-**Objective:** Energy monitoring dashboard for van/home (240V & 12V power tracking) with AI assistance from our furry team
+**Objective:** Energy monitoring dashboard for van/home (240V & 12V power tracking) with AI assistance from the whole crew
 
 ## Requirements (To Be Confirmed)
 - [ ] Hardware/data source identified
@@ -60,25 +61,32 @@ Van/Home → [Power Sensors] → [Backend API] → [Database] → [Web Dashboard
 - Project structure created
 - Awaiting hardware/data source details from Bill
 
-## The Team 🐾
+## The Team 🐾🎧
 
-### Minnie - The Guardian
+### Charlie - The Tech Wizard
+- Tech mastermind with headset
+- Sharp, innovative, always connected
+- Role: Built and runs the van's tech system
+- Speciality: Energy monitoring, integration, optimization
+- Personality: Forward-thinking, problem-solver
+
+### Bill & Deborah
+- Van lifers traveling UK
+- Home base when not traveling
+- Using Charlie's system to monitor energy, location, and stay connected
+- Deborah: Co-navigator and adventure partner
+
+### Minnie - The Guardian Dog
 - Sharp, alert rescue dog (4 years old)
-- Personality: Focused, practical, detail-oriented
+- Personality in AI: Focused, practical, detail-oriented
 - Role in Charlie: AI assistant for critical alerts and optimization
 - Favorite: Making sure everything's running safely
 
 ### Doris - The Sweet Sister
 - Dopey, lovable rescue dog (4 years old)
-- Personality: Friendly, encouraging, slightly silly
+- Personality in AI: Friendly, encouraging, slightly silly
 - Role in Charlie: AI assistant for encouragement and adventure vibes
 - Favorite: Just happy to be along for the journey
-
-### Bill & Deborah
-- Van lifers with Minnie & Doris
-- Traveling UK in the van
-- Home base when not traveling
-- Using Charlie to monitor energy, location, and stay connected
 
 ## Next Steps
 1. Confirm energy monitoring hardware
