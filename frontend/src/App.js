@@ -3,6 +3,7 @@ import axios from 'axios';
 import Dashboard from './components/Dashboard';
 import DataEntry from './components/DataEntry';
 import AuthModal from './components/AuthModal';
+import SyncStatus from './components/SyncStatus';
 import './App.css';
 
 function App() {
@@ -14,6 +15,9 @@ function App() {
   const [pin, setPin] = useState('');
   const [authRequired, setAuthRequired] = useState(false);
   const [error, setError] = useState(null);
+  const [lastSyncTime, setLastSyncTime] = useState(null);
+  const [nextSyncTime, setNextSyncTime] = useState(null);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -45,6 +49,7 @@ function App() {
       const headers = pin ? { 'x-dashboard-pin': pin } : {};
       const response = await axios.get(`${API_URL}/readings/latest`, { headers });
       setLatestReading(response.data);
+      setLastSyncTime(new Date());
       setError(null);
     } catch (error) {
       if (error.response?.status === 401) {
@@ -70,10 +75,22 @@ function App() {
   useEffect(() => {
     if (!authenticated) return;
     
+    setIsSyncing(true);
     fetchLatestReading();
     fetchReadings24h();
+    const calculateNextSync = () => {
+      const next = new Date();
+      next.setMinutes(next.getMinutes() + 20);
+      setNextSyncTime(next.toLocaleTimeString());
+    };
+    calculateNextSync();
+    setIsSyncing(false);
+    
     const interval = setInterval(() => {
+      setIsSyncing(true);
       fetchLatestReading();
+      calculateNextSync();
+      setIsSyncing(false);
     }, 1200000); // Poll every 20 minutes
     return () => clearInterval(interval);
   }, [authenticated, pin]);
@@ -137,6 +154,7 @@ function App() {
         {activeTab === 'entry' && (
           <DataEntry onSubmit={handleDataSubmit} loading={loading} pin={pin} />
         )}
+        <SyncStatus loading={isSyncing} lastUpdate={lastSyncTime} nextUpdate={nextSyncTime} />
       </main>
     </div>
   );
