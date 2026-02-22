@@ -10,6 +10,8 @@ import DJMixer from './components/DJMixer';
 import AirplaneTracker from './components/AirplaneTracker';
 import TapoLED from './components/TapoLED';
 import HamRadio from './components/HamRadio';
+import CampsiteFinder from './components/CampsiteFinder';
+import MediaConverter from './components/MediaConverter';
 import './App.css';
 
 function App() {
@@ -186,6 +188,18 @@ function App() {
         >
           📻 Ham Radio
         </button>
+        <button
+          className={`tab ${activeTab === 'camps' ? 'active' : ''}`}
+          onClick={() => setActiveTab('camps')}
+        >
+          🏕️ Campsites
+        </button>
+        <button
+          className={`tab ${activeTab === 'media' ? 'active' : ''}`}
+          onClick={() => setActiveTab('media')}
+        >
+          🎬 Media Converter
+        </button>
       </nav>
 
       <main className="content">
@@ -213,6 +227,12 @@ function App() {
         )}
         {activeTab === 'radio' && (
           <HamRadio />
+        )}
+        {activeTab === 'camps' && (
+          <CampsiteFinder />
+        )}
+        {activeTab === 'media' && (
+          <MediaConverter />
         )}
         <SyncStatus loading={isSyncing} lastUpdate={lastSyncTime} nextUpdate={nextSyncTime} />
       </main>
