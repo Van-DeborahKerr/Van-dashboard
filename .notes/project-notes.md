@@ -1,7 +1,8 @@
 # Charlie - Van Dashboard Project
-**Owner:** Bill  
+**Owner:** Bill & Deborah Shackel  
+**Team:** Minnie (guardian) & Doris (dopey sister) 🐾  
 **Start Date:** 2026-02-22  
-**Objective:** Energy monitoring dashboard for van/home (240V & 12V power tracking)
+**Objective:** Energy monitoring dashboard for van/home (240V & 12V power tracking) with AI assistance from our furry team
 
 ## Requirements (To Be Confirmed)
 - [ ] Hardware/data source identified
@@ -58,6 +59,26 @@ Van/Home → [Power Sensors] → [Backend API] → [Database] → [Web Dashboard
 ## Current Status
 - Project structure created
 - Awaiting hardware/data source details from Bill
+
+## The Team 🐾
+
+### Minnie - The Guardian
+- Sharp, alert rescue dog (4 years old)
+- Personality: Focused, practical, detail-oriented
+- Role in Charlie: AI assistant for critical alerts and optimization
+- Favorite: Making sure everything's running safely
+
+### Doris - The Sweet Sister
+- Dopey, lovable rescue dog (4 years old)
+- Personality: Friendly, encouraging, slightly silly
+- Role in Charlie: AI assistant for encouragement and adventure vibes
+- Favorite: Just happy to be along for the journey
+
+### Bill & Deborah
+- Van lifers with Minnie & Doris
+- Traveling UK in the van
+- Home base when not traveling
+- Using Charlie to monitor energy, location, and stay connected
 
 ## Next Steps
 1. Confirm energy monitoring hardware
