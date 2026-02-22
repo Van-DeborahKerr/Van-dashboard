@@ -1,0 +1,137 @@
+.live-map {
+  display: grid;
+  gap: 20px;
+}
+
+.map-config {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.map-config h3 {
+  color: #1b5e20;
+  margin-bottom: 15px;
+  font-size: 1.3em;
+}
+
+.config-form {
+  display: grid;
+  gap: 15px;
+}
+
+.map-error {
+  background: #ffebee;
+  color: #b71c1c;
+  padding: 12px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.form-group {
+  display: grid;
+  gap: 8px;
+}
+
+.form-group label {
+  color: #1b5e20;
+  font-weight: 600;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #81c784;
+  border-radius: 5px;
+  font-size: 0.95em;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #2e7d32;
+  box-shadow: 0 0 8px rgba(46, 125, 50, 0.3);
+}
+
+.form-group small {
+  color: #558b2f;
+  font-size: 0.85em;
+}
+
+.map-btn {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.map-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(66, 133, 66, 0.3);
+}
+
+.map-btn.disconnect {
+  background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+}
+
+.map-btn.disconnect:hover {
+  box-shadow: 0 8px 20px rgba(229, 57, 53, 0.3);
+}
+
+.map-connected {
+  background: #f1f8e9;
+  padding: 15px;
+  border-radius: 5px;
+  border-left: 4px solid #66bb6a;
+}
+
+.map-connected p {
+  margin: 10px 0;
+  color: #1b5e20;
+}
+
+.map-note {
+  background: white;
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 15px;
+  border-left: 4px solid #ffb74d;
+}
+
+.map-note p {
+  color: #666;
+  font-size: 0.9em;
+  margin: 5px 0;
+}
+
+.map-container {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.map-instructions {
+  color: #666;
+  font-size: 0.9em;
+  margin-top: 10px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .map-config {
+    padding: 15px;
+  }
+
+  .form-group input {
+    font-size: 16px; /* Prevent mobile zoom */
+  }
+
+  .map-btn {
+    padding: 10px 15px;
+  }
+}

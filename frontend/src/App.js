@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import DataEntry from './components/DataEntry';
 import AuthModal from './components/AuthModal';
 import SyncStatus from './components/SyncStatus';
+import LiveMap from './components/LiveMap';
 import './App.css';
 
 function App() {
@@ -144,6 +145,12 @@ function App() {
         >
           Add Reading
         </button>
+        <button
+          className={`tab ${activeTab === 'map' ? 'active' : ''}`}
+          onClick={() => setActiveTab('map')}
+        >
+          Van Map
+        </button>
       </nav>
 
       <main className="content">
@@ -153,6 +160,9 @@ function App() {
         )}
         {activeTab === 'entry' && (
           <DataEntry onSubmit={handleDataSubmit} loading={loading} pin={pin} />
+        )}
+        {activeTab === 'map' && (
+          <LiveMap />
         )}
         <SyncStatus loading={isSyncing} lastUpdate={lastSyncTime} nextUpdate={nextSyncTime} />
       </main>
