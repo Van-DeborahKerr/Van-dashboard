@@ -5,6 +5,7 @@ import DataEntry from './components/DataEntry';
 import AuthModal from './components/AuthModal';
 import SyncStatus from './components/SyncStatus';
 import LiveMap from './components/LiveMap';
+import AIAssistant from './components/AIAssistant';
 import './App.css';
 
 function App() {
@@ -151,6 +152,12 @@ function App() {
         >
           Van Map
         </button>
+        <button
+          className={`tab ${activeTab === 'ai' ? 'active' : ''}`}
+          onClick={() => setActiveTab('ai')}
+        >
+          AI Assistant
+        </button>
       </nav>
 
       <main className="content">
@@ -163,6 +170,9 @@ function App() {
         )}
         {activeTab === 'map' && (
           <LiveMap />
+        )}
+        {activeTab === 'ai' && (
+          <AIAssistant />
         )}
         <SyncStatus loading={isSyncing} lastUpdate={lastSyncTime} nextUpdate={nextSyncTime} />
       </main>
