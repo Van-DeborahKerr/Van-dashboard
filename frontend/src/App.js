@@ -6,6 +6,10 @@ import AuthModal from './components/AuthModal';
 import SyncStatus from './components/SyncStatus';
 import LiveMap from './components/LiveMap';
 import AIAssistant from './components/AIAssistant';
+import DJMixer from './components/DJMixer';
+import AirplaneTracker from './components/AirplaneTracker';
+import TapoLED from './components/TapoLED';
+import HamRadio from './components/HamRadio';
 import './App.css';
 
 function App() {
@@ -158,6 +162,30 @@ function App() {
         >
           AI Assistant
         </button>
+        <button
+          className={`tab ${activeTab === 'dj' ? 'active' : ''}`}
+          onClick={() => setActiveTab('dj')}
+        >
+          🎧 DJ Mixer
+        </button>
+        <button
+          className={`tab ${activeTab === 'planes' ? 'active' : ''}`}
+          onClick={() => setActiveTab('planes')}
+        >
+          ✈️ Airplanes
+        </button>
+        <button
+          className={`tab ${activeTab === 'led' ? 'active' : ''}`}
+          onClick={() => setActiveTab('led')}
+        >
+          💡 LED Control
+        </button>
+        <button
+          className={`tab ${activeTab === 'radio' ? 'active' : ''}`}
+          onClick={() => setActiveTab('radio')}
+        >
+          📻 Ham Radio
+        </button>
       </nav>
 
       <main className="content">
@@ -173,6 +201,18 @@ function App() {
         )}
         {activeTab === 'ai' && (
           <AIAssistant />
+        )}
+        {activeTab === 'dj' && (
+          <DJMixer />
+        )}
+        {activeTab === 'planes' && (
+          <AirplaneTracker />
+        )}
+        {activeTab === 'led' && (
+          <TapoLED />
+        )}
+        {activeTab === 'radio' && (
+          <HamRadio />
         )}
         <SyncStatus loading={isSyncing} lastUpdate={lastSyncTime} nextUpdate={nextSyncTime} />
       </main>
