@@ -1,0 +1,146 @@
+.dashboard {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.status-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.card {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card h3 {
+  color: #2a5298;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+  border-bottom: 2px solid #2a5298;
+  padding-bottom: 10px;
+}
+
+.reading {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(42, 82, 152, 0.2);
+}
+
+.reading span {
+  color: #666;
+  font-weight: 500;
+}
+
+.reading strong {
+  color: #2a5298;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.status-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.status-card h3 {
+  color: white;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.status {
+  font-size: 1.5em;
+  font-weight: bold;
+  padding: 15px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.status.active {
+  background: #4CAF50;
+  color: white;
+}
+
+.status.inactive {
+  background: #f44336;
+  color: white;
+}
+
+.info-card {
+  background: linear-gradient(135deg, #FFD89B 0%, #19547B 100%);
+}
+
+.info-card h3 {
+  color: white;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.info-card p {
+  color: white;
+  font-size: 1.2em;
+  margin-top: 10px;
+}
+
+.charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.chart-container {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container h3 {
+  color: #2a5298;
+  margin-bottom: 20px;
+  font-size: 1.1em;
+}
+
+@media (max-width: 1024px) {
+  .status-cards {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .status-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .card h3 {
+    font-size: 1em;
+  }
+
+  .reading {
+    font-size: 0.9em;
+  }
+}

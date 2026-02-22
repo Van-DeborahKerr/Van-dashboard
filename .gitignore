@@ -1,0 +1,15 @@
+node_modules/
+npm-debug.log
+.env
+.env.local
+.DS_Store
+dist/
+build/
+coverage/
+*.log
+.vscode/
+.idea/
+backend/data/charlie.db
+frontend/build/
+.next/
+out/
