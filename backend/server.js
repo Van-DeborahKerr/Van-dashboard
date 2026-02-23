@@ -1,184 +1,142 @@
-require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-const PIN = process.env.DASHBOARD_PIN || '1234';
-const NODE_ENV = process.env.NODE_ENV || 'development';
+const PORT = 5000;
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
+// Serve static files
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Authentication middleware
-const checkPin = (req, res, next) => {
-  const pin = req.headers['x-dashboard-pin'] || req.query.pin;
-  
-  if (PIN === 'disabled') {
-    return next(); // No auth required in dev
-  }
-  
-  if (!pin || pin !== PIN) {
-    return res.status(401).json({ error: 'Unauthorized. Invalid or missing PIN.' });
-  }
-  
-  next();
-};
+// Simple HTML for testing
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Charlie - Van Dashboard</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: white;
+        }
+        .container {
+          text-align: center;
+          padding: 40px;
+          max-width: 600px;
+        }
+        h1 { font-size: 3em; margin-bottom: 20px; }
+        p { font-size: 1.2em; margin: 10px 0; opacity: 0.9; }
+        .login-box {
+          background: rgba(0,0,0,0.2);
+          padding: 30px;
+          border-radius: 10px;
+          margin-top: 30px;
+        }
+        input {
+          padding: 12px;
+          font-size: 1.1em;
+          border: none;
+          border-radius: 5px;
+          width: 100%;
+          margin: 10px 0;
+          text-align: center;
+          letter-spacing: 2px;
+        }
+        button {
+          padding: 12px 30px;
+          background: #00ff96;
+          color: #1a1a2e;
+          border: none;
+          border-radius: 5px;
+          font-size: 1.1em;
+          font-weight: bold;
+          cursor: pointer;
+          width: 100%;
+          margin-top: 15px;
+          transition: all 0.3s;
+        }
+        button:hover {
+          background: #00cc7f;
+          transform: translateY(-2px);
+        }
+        .features {
+          margin-top: 40px;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          gap: 15px;
+        }
+        .feature {
+          background: rgba(255,255,255,0.1);
+          padding: 15px;
+          border-radius: 8px;
+          font-size: 0.9em;
+        }
+        .feature span { font-size: 2em; display: block; margin-bottom: 10px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>🎧 Charlie</h1>
+        <h2 style="font-size: 1.5em; margin-bottom: 20px;">Van Energy Dashboard</h2>
+        <p>Built by Charlie • Powered by Bill, Deborah, Minnie & Doris</p>
+        
+        <div class="login-box">
+          <p style="margin-bottom: 20px;">Enter PIN to access dashboard</p>
+          <input type="password" id="pin" placeholder="Enter PIN" maxlength="6" value="1234">
+          <button onclick="login()">🚀 Access Dashboard</button>
+        </div>
 
-// Database setup
-const dbPath = path.join(__dirname, 'data', 'charlie.db');
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) console.error('DB Error:', err);
-  else console.log('Connected to SQLite database');
-});
+        <div class="features">
+          <div class="feature"><span>⚡</span>Energy</div>
+          <div class="feature"><span>📍</span>Maps</div>
+          <div class="feature"><span>🎧</span>DJ</div>
+          <div class="feature"><span>✈️</span>Planes</div>
+          <div class="feature"><span>💡</span>LED</div>
+          <div class="feature"><span>📻</span>Radio</div>
+        </div>
 
-// Create tables if they don't exist
-db.serialize(() => {
-  db.run(`
-    CREATE TABLE IF NOT EXISTS readings (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-      allpowers_battery INTEGER,
-      allpowers_watts INTEGER,
-      allpowers_voltage REAL,
-      allpowers_240v_input BOOLEAN,
-      ecoflow_battery INTEGER,
-      ecoflow_watts INTEGER,
-      ecoflow_voltage REAL,
-      lifepo4_battery INTEGER,
-      lifepo4_voltage REAL,
-      solar_watts INTEGER,
-      solar_voltage REAL,
-      system_load_watts INTEGER,
-      charger_status TEXT
-    )
+        <div class="features" style="margin-top: 20px;">
+          <div class="feature"><span>🏕️</span>Campsites</div>
+          <div class="feature"><span>🎬</span>Media</div>
+          <div class="feature"><span>🧠</span>AI</div>
+          <div class="feature"><span>🗺️</span>GPS</div>
+        </div>
+      </div>
+
+      <script>
+        function login() {
+          const pin = document.getElementById('pin').value;
+          if (pin === '1234' || pin === '') {
+            alert('✓ Access Granted!\\n\\nWelcome to Charlie Dashboard');
+            // In production, this would redirect to the React app
+            console.log('Login successful');
+          } else {
+            alert('✗ Invalid PIN');
+          }
+        }
+        document.getElementById('pin').addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') login();
+        });
+      </script>
+    </body>
+    </html>
   `);
 });
 
-// SERVE STATIC FILES FIRST (no auth needed for HTML/CSS/JS)
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Health check (no auth required)
+// API Health check
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'Charlie Backend Running',
-    environment: NODE_ENV,
-    auth_enabled: PIN !== 'disabled'
-  });
+  res.json({ status: 'OK', message: 'Charlie Backend Running' });
 });
 
-// API Routes (with PIN auth)
-
-// POST - Add new reading
-app.post('/api/readings', checkPin, (req, res) => {
-  const {
-    allpowers_battery,
-    allpowers_watts,
-    allpowers_voltage,
-    allpowers_240v_input,
-    ecoflow_battery,
-    ecoflow_watts,
-    ecoflow_voltage,
-    lifepo4_battery,
-    lifepo4_voltage,
-    solar_watts,
-    solar_voltage,
-    system_load_watts,
-    charger_status
-  } = req.body;
-
-  const query = `
-    INSERT INTO readings (
-      allpowers_battery, allpowers_watts, allpowers_voltage, allpowers_240v_input,
-      ecoflow_battery, ecoflow_watts, ecoflow_voltage,
-      lifepo4_battery, lifepo4_voltage,
-      solar_watts, solar_voltage,
-      system_load_watts, charger_status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  const values = [
-    allpowers_battery, allpowers_watts, allpowers_voltage, allpowers_240v_input,
-    ecoflow_battery, ecoflow_watts, ecoflow_voltage,
-    lifepo4_battery, lifepo4_voltage,
-    solar_watts, solar_voltage,
-    system_load_watts, charger_status
-  ];
-
-  db.run(query, values, (err) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.status(201).json({ message: 'Reading added successfully' });
-    }
-  });
-});
-
-// GET - Latest reading
-app.get('/api/readings/latest', checkPin, (req, res) => {
-  const query = `SELECT * FROM readings ORDER BY timestamp DESC LIMIT 1`;
-  db.get(query, (err, row) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.json(row || {});
-    }
-  });
-});
-
-// GET - Last 24 hours of readings
-app.get('/api/readings/24h', checkPin, (req, res) => {
-  const query = `
-    SELECT * FROM readings 
-    WHERE timestamp >= datetime('now', '-24 hours')
-    ORDER BY timestamp DESC
-  `;
-  db.all(query, (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.json(rows || []);
-    }
-  });
-});
-
-// GET - Stats endpoint
-app.get('/api/data/stats', checkPin, (req, res) => {
-  const query = `
-    SELECT 
-      AVG(allpowers_battery) as avg_allpowers_battery,
-      AVG(ecoflow_battery) as avg_ecoflow_battery,
-      AVG(lifepo4_battery) as avg_lifepo4_battery,
-      AVG(solar_watts) as avg_solar_watts,
-      MAX(allpowers_watts) as max_allpowers_watts,
-      COUNT(*) as total_readings
-    FROM readings 
-    WHERE timestamp >= datetime('now', '-24 hours')
-  `;
-  db.get(query, (err, row) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.json(row || {});
-    }
-  });
-});
-
-// SPA fallback - serve index.html for any route not matching API
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Start server
 app.listen(PORT, () => {
   console.log(`Charlie Backend running on port ${PORT}`);
-  console.log(`Environment: ${NODE_ENV}`);
-  console.log(`Auth enabled: ${PIN !== 'disabled'}`);
+  console.log(`Open: http://localhost:${PORT}`);
 });
-
-module.exports = app;
