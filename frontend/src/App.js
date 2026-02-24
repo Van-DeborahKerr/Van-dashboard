@@ -20,7 +20,7 @@ function App() {
   const [readings24h, setReadings24h] = useState([]);
   const [activeTab, setActiveTab] = useState('home');
   const [loading, setLoading] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
+  const [authenticated, setAuthenticated] = useState(true);
   const [pin, setPin] = useState('');
   const [authRequired, setAuthRequired] = useState(false);
   const [error, setError] = useState(null);
@@ -28,29 +28,26 @@ function App() {
   const [nextSyncTime, setNextSyncTime] = useState(null);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+  const API_URL = '/api';
 
   // Check if auth is required on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const response = await axios.get(`${API_URL}/health`);
-        if (response.data.auth_enabled) {
+        if (response.data && response.data.auth_enabled) {
           setAuthRequired(true);
           const storedPin = localStorage.getItem('charlie-pin');
           if (storedPin) {
             setPin(storedPin);
-            setAuthenticated(true);
           }
-        } else {
-          setAuthenticated(true);
         }
       } catch (err) {
         console.error('Error checking auth:', err);
       }
     };
     checkAuth();
-  }, [API_URL]);
+  }, []);
 
   // Fetch latest reading
   const fetchLatestReading = async () => {
@@ -82,11 +79,10 @@ function App() {
 
   // Initial load and set polling
   useEffect(() => {
-    if (!authenticated) return;
-    
     setIsSyncing(true);
     fetchLatestReading();
     fetchReadings24h();
+    
     const calculateNextSync = () => {
       const next = new Date();
       next.setMinutes(next.getMinutes() + 20);
@@ -101,8 +97,9 @@ function App() {
       calculateNextSync();
       setIsSyncing(false);
     }, 1200000); // Poll every 20 minutes
+    
     return () => clearInterval(interval);
-  }, [authenticated, pin]);
+  }, [pin]);
 
   const handleAuthSubmit = (inputPin) => {
     setPin(inputPin);
@@ -124,7 +121,7 @@ function App() {
     localStorage.removeItem('charlie-pin');
   };
 
-  if (!authenticated) {
+  if (!authenticated && authRequired) {
     return (
       <div>
         <Home />
