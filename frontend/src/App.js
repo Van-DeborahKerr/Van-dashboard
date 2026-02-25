@@ -22,6 +22,7 @@ function App() {
   const [lastSyncTime, setLastSyncTime] = useState(null);
   const [nextSyncTime, setNextSyncTime] = useState(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [networkMode, setNetworkMode] = useState('local');
 
   const API_URL = '/api';
 
@@ -75,8 +76,30 @@ function App() {
   return (
     <div className="App">
       <header className="header">
-        <h1>🎧 Charlie - Van Energy Dashboard</h1>
-        <p>Built by Charlie. Powered by Bill, Deborah, Minnie & Doris</p>
+        <div className="header-top">
+          <h1>🎧 Charlie - Van Energy Dashboard</h1>
+          <p>Built by Charlie. Powered by Bill, Deborah, Minnie & Doris</p>
+        </div>
+        
+        <div className="network-toggle">
+          <button
+            className={`network-btn ${networkMode === 'local' ? 'active' : ''}`}
+            onClick={() => setNetworkMode('local')}
+            title="Local network only"
+          >
+            📡 Local
+          </button>
+          <button
+            className={`network-btn ${networkMode === 'wifi' ? 'active' : ''}`}
+            onClick={() => setNetworkMode('wifi')}
+            title="WiFi/Internet enabled"
+          >
+            🌐 WiFi
+          </button>
+          <span className="network-status">
+            {networkMode === 'local' ? '192.168.188.x' : 'Internet Ready'}
+          </span>
+        </div>
       </header>
 
       <nav className="tabs">
@@ -104,7 +127,7 @@ function App() {
         {activeTab === 'led' && <TapoLED />}
         {activeTab === 'radio' && <HamRadio />}
         {activeTab === 'camps' && <CampsiteFinder />}
-        {activeTab === 'media' && <MediaConverter />}
+        {activeTab === 'media' && <MediaConverter networkMode={networkMode} />}
         <SyncStatus loading={isSyncing} lastUpdate={lastSyncTime} nextUpdate={nextSyncTime} />
       </main>
     </div>

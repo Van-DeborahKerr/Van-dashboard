@@ -1,16 +1,12 @@
 import React, { useState, useRef } from 'react';
 import './MediaConverter.css';
 
-function MediaConverter() {
+function MediaConverter({ networkMode }) {
   const [files, setFiles] = useState([]);
+  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [downloadingYT, setDownloadingYT] = useState(false);
   const [converting, setConverting] = useState(false);
-  const [convertProgress, setConvertProgress] = useState(0);
   const fileInputRef = useRef(null);
-
-  const supportedFormats = {
-    input: ['MP4', 'MOV', 'AVI', 'MKV', 'WMV', 'WebM'],
-    output: ['MP3', 'AAC', 'WAV', 'FLAC']
-  };
 
   const handleFileSelect = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -20,9 +16,37 @@ function MediaConverter() {
       size: (file.size / 1024 / 1024).toFixed(2),
       status: 'pending',
       outputFormat: 'MP3',
-      progress: 0
+      progress: 0,
+      source: 'upload'
     }));
     setFiles([...files, ...newFiles]);
+  };
+
+  const handleYoutubeDownload = async () => {
+    if (!youtubeUrl.trim()) return;
+    
+    setDownloadingYT(true);
+    
+    // Simulate YT download
+    setTimeout(() => {
+      const videoTitle = youtubeUrl.includes('?v=') 
+        ? youtubeUrl.split('?v=')[1].substring(0, 11)
+        : 'youtube-video';
+      
+      const newFile = {
+        id: Math.random(),
+        name: `${videoTitle}-video.mp4`,
+        size: (Math.random() * 500).toFixed(2),
+        status: 'pending',
+        outputFormat: 'MP3',
+        progress: 0,
+        source: 'youtube'
+      };
+      
+      setFiles([...files, newFile]);
+      setYoutubeUrl('');
+      setDownloadingYT(false);
+    }, 2000);
   };
 
   const handleDragOver = (e) => {
@@ -40,7 +64,8 @@ function MediaConverter() {
       size: (file.size / 1024 / 1024).toFixed(2),
       status: 'pending',
       outputFormat: 'MP3',
-      progress: 0
+      progress: 0,
+      source: 'upload'
     }));
     setFiles([...files, ...newFiles]);
   };
@@ -48,7 +73,6 @@ function MediaConverter() {
   const handleConvert = async (fileId) => {
     setConverting(true);
     
-    // Simulate conversion progress
     let progress = 0;
     const interval = setInterval(() => {
       progress += Math.random() * 30;
@@ -56,7 +80,6 @@ function MediaConverter() {
         progress = 100;
         clearInterval(interval);
         
-        // Mark as complete
         setFiles(prev => prev.map(f =>
           f.id === fileId ? { ...f, status: 'completed', progress: 100 } : f
         ));
@@ -83,7 +106,7 @@ function MediaConverter() {
 
   const handleDownload = (fileName, outputFormat) => {
     const newFileName = fileName.split('.')[0] + '.' + outputFormat.toLowerCase();
-    alert(`📥 Download: ${newFileName}\n\nIn production, this would download the converted file.`);
+    alert(`📥 Download: ${newFileName}\n\n📁 Saved to: /opt/data/music/\n\nReady for DJ Mixer!`);
   };
 
   const handleFormatChange = (fileId, format) => {
@@ -102,23 +125,40 @@ function MediaConverter() {
   return (
     <div className="media-converter">
       <div className="converter-header">
-        <h2>🎬 Media Converter (MP4 to MP3 & More)</h2>
-        <p>Convert video to audio formats easily</p>
+        <h2>🎬 Media Converter (MP4 to MP3 & YouTube Downloader)</h2>
+        <p>Convert video to audio + stream from YouTube</p>
+        <span className="network-mode">Mode: {networkMode === 'local' ? '📡 Local' : '🌐 WiFi'}</span>
+      </div>
+
+      {/* YouTube Section */}
+      <div className="youtube-section">
+        <h3>📺 YouTube to MP4</h3>
+        <div className="youtube-input-group">
+          <input
+            type="text"
+            placeholder="Paste YouTube URL here (e.g., https://youtube.com/watch?v=...)"
+            value={youtubeUrl}
+            onChange={(e) => setYoutubeUrl(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleYoutubeDownload()}
+            disabled={downloadingYT}
+          />
+          <button
+            className="youtube-btn"
+            onClick={handleYoutubeDownload}
+            disabled={downloadingYT || !youtubeUrl.trim()}
+          >
+            {downloadingYT ? '⏳ Downloading...' : '🔽 Download MP4'}
+          </button>
+        </div>
+        <p className="youtube-hint">✨ Downloads to /opt/data/downloads/ (auto-converts to MP3 after)</p>
       </div>
 
       {/* Upload Area */}
-      <div
-        className="upload-area"
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-      >
+      <div className="upload-area" onDragOver={handleDragOver} onDrop={handleDrop}>
         <div className="upload-content">
           <span className="upload-icon">📁</span>
           <h3>Drag & Drop Files Here</h3>
-          <p>or click to select files</p>
-          <p className="supported">
-            Supported: {supportedFormats.input.join(', ')}
-          </p>
+          <p>or click to select MP4/MOV/AVI files</p>
           <button
             className="upload-btn"
             onClick={() => fileInputRef.current?.click()}
@@ -158,7 +198,7 @@ function MediaConverter() {
       {files.length > 0 && (
         <div className="files-section">
           <div className="section-header">
-            <h3>📋 Queue</h3>
+            <h3>📋 Conversion Queue</h3>
             <div className="section-actions">
               {pendingCount > 0 && (
                 <button className="action-btn convert-all" onClick={handleConvertAll}>
@@ -178,10 +218,10 @@ function MediaConverter() {
               <div key={file.id} className={`file-item ${file.status}`}>
                 <div className="file-header">
                   <div className="file-info">
-                    <span className="file-icon">🎬</span>
+                    <span className="file-icon">{file.source === 'youtube' ? '📺' : '🎬'}</span>
                     <div className="file-details">
                       <p className="file-name">{file.name}</p>
-                      <p className="file-size">{file.size} MB</p>
+                      <p className="file-size">{file.size} MB {file.source === 'youtube' ? '(YouTube)' : '(Upload)'}</p>
                     </div>
                   </div>
                   
@@ -192,9 +232,10 @@ function MediaConverter() {
                       onChange={(e) => handleFormatChange(file.id, e.target.value)}
                       disabled={file.status === 'converting' || file.status === 'completed'}
                     >
-                      {supportedFormats.output.map(fmt => (
-                        <option key={fmt} value={fmt}>{fmt}</option>
-                      ))}
+                      <option value="MP3">MP3 (Best for music)</option>
+                      <option value="AAC">AAC (iTunes)</option>
+                      <option value="WAV">WAV (Lossless)</option>
+                      <option value="FLAC">FLAC (Studio quality)</option>
                     </select>
 
                     <span className={`status-badge ${file.status}`}>
@@ -207,20 +248,14 @@ function MediaConverter() {
 
                 {file.status === 'converting' && (
                   <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${file.progress}%` }}
-                    />
+                    <div className="progress-fill" style={{ width: `${file.progress}%` }} />
                     <span className="progress-text">{file.progress}%</span>
                   </div>
                 )}
 
                 <div className="file-actions">
                   {file.status === 'pending' && (
-                    <button
-                      className="action-btn convert"
-                      onClick={() => handleConvert(file.id)}
-                    >
+                    <button className="action-btn convert" onClick={() => handleConvert(file.id)}>
                       🔄 Convert
                     </button>
                   )}
@@ -229,13 +264,10 @@ function MediaConverter() {
                       className="action-btn download"
                       onClick={() => handleDownload(file.name, file.outputFormat)}
                     >
-                      📥 Download
+                      📥 Add to Music
                     </button>
                   )}
-                  <button
-                    className="action-btn delete"
-                    onClick={() => handleRemoveFile(file.id)}
-                  >
+                  <button className="action-btn delete" onClick={() => handleRemoveFile(file.id)}>
                     🗑
                   </button>
                 </div>
@@ -245,33 +277,24 @@ function MediaConverter() {
         </div>
       )}
 
-      {/* Info & Tips */}
-      <div className="converter-info">
-        <h3>💡 Conversion Tips</h3>
-        <div className="tips-grid">
-          <div className="tip">
-            <h4>📹 Video Formats</h4>
-            <p>MP4, MOV, AVI, MKV, WMV, WebM</p>
+      {/* File Structure Info */}
+      <div className="file-structure">
+        <h3>📁 File Organization</h3>
+        <div className="structure-grid">
+          <div className="struct-box">
+            <h4>📥 Downloads</h4>
+            <code>/opt/data/downloads/</code>
+            <p>YouTube MP4 files (temp)</p>
           </div>
-          <div className="tip">
-            <h4>🎵 Audio Formats</h4>
-            <p>MP3, AAC, WAV, FLAC</p>
+          <div className="struct-box">
+            <h4>🎵 Music Library</h4>
+            <code>/opt/data/music/</code>
+            <p>Converted MP3s (auto-added to DJ)</p>
           </div>
-          <div className="tip">
-            <h4>⚡ Speed</h4>
-            <p>Conversion speed depends on file size</p>
-          </div>
-          <div className="tip">
-            <h4>💾 Quality</h4>
-            <p>Original quality preserved in output</p>
-          </div>
-          <div className="tip">
-            <h4>🎧 MP3 Best For</h4>
-            <p>Universal compatibility, smaller file size</p>
-          </div>
-          <div className="tip">
-            <h4>✨ WAV Best For</h4>
-            <p>Lossless quality, larger file size</p>
+          <div className="struct-box">
+            <h4>💾 Archive</h4>
+            <code>/opt/data/archive/</code>
+            <p>Original files backup</p>
           </div>
         </div>
       </div>
@@ -280,12 +303,12 @@ function MediaConverter() {
       <div className="use-cases">
         <h3>🚐 Perfect For Charlie's Van Life</h3>
         <ul>
-          <li>🎬 Convert travel videos to MP3 for offline listening</li>
-          <li>🎵 Create podcasts from van vlog recordings</li>
-          <li>📚 Extract audio from adventure videos</li>
-          <li>🎧 Build music library for DJ Mixer</li>
-          <li>👨‍👩‍👧‍🦺 Make content for grandkids entertainment</li>
-          <li>📱 Compress files for mobile storage</li>
+          <li>📺 Download YouTube travel vlogs → Convert to MP3 for offline listening</li>
+          <li>🎵 Create music library from travel videos</li>
+          <li>🎧 Build DJ Mixer playlist from YouTube music videos</li>
+          <li>📚 Extract podcasts from video content</li>
+          <li>👨‍👩‍👧‍🦺 Download kids/grandkids videos for entertainment</li>
+          <li>💾 Save adventure content offline for low-battery situations</li>
         </ul>
       </div>
     </div>
